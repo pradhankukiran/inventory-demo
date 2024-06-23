@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <title>Dashboard | KOELIS</title>
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Inventory Management & Tracking</h1>
+      <img class="logo" src="https://i.ibb.co/10RLjqy/Untitled-design-removebg-preview.png" alt="Logo" />
+    </header>
+
+    <div class="content">
+      <div class="section">
+        <h2>Demos</h2>
+        <form id="addDemoForm">
+          <div class="wide-input">
+            <label for="demoSalesperson">Salesperson</label>
+            <select id="demoSalesperson" required>
+              <option value="">Select Salesperson</option>
+              <option value="Alex Blow">Alex Blow</option>
+              <option value="Dustin French">Dustin French</option>
+              <option value="Jake Richard">Jake Richard</option>
+              <option value="Armando Moreno">Armando Moreno</option>
+              <option value="Alexa Corn">Alexa Corn</option>
+              <option value="Jesse Paolella">Jesse Paolella</option>
+            </select>
+          </div>
+          <div class="wide-input">
+            <label for="demoName">Account</label>
+            <input type="text" id="demoName" placeholder="Account" required />
+          </div>
+          <div class="wide-input">
+            <label for="demoLocation">Location</label>
+            <input type="text" id="demoLocation" placeholder="Location" required />
+          </div>
+          <div class="date-container">
+            <label for="demoStartDate">Start Date</label>
+            <input type="text" id="demoStartDate" class="small-input" placeholder="Start Date" required />
+          </div>
+          <div class="date-container">
+            <label for="demoEndDate">End Date</label>
+            <input type="text" id="demoEndDate" class="small-input" placeholder="End Date" required />
+          </div>
+          <button type="submit">Add Demo</button>
+        </form>
+        <div id="demoList"></div>
+      </div>
+
+      <div id="demoTemplate" class="entry" style="display: none">
+        <div class="entry-header">
+          <span class="demo-details"></span>
+          <div class="actions">
+            <button class="edit" onclick="editEvent(event, this)">✏️</button>
+            <button class="delete" onclick="confirmDeleteEvent(event, this)">🗑️</button>
+          </div>
+        </div>
+        <div class="entry-content">
+          <table>
+            <tr>
+              <th>Salesperson</th>
+              <td class="demo-salesperson"></td>
+            </tr>
+            <tr>
+              <th>Account</th>
+              <td class="demo-account"></td>
+            </tr>
+            <tr>
+              <th>Location</th>
+              <td class="demo-location"></td>
+            </tr>
+            <tr>
+              <th>Dates</th>
+              <td class="demo-dates"></td>
+            </tr>
+            <tr>
+              <th>
+                Equipment
+                <button class="note-button" onclick="showAddEquipmentSection(this, 'demo')">+</button>
+              </th>
+              <td class="equipment">
+                <button id="exportDemoButton" style="display: none" onclick="exportDemoEquipment()">
+                  Export
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <th>Tasks</th>
+              <td class="tasks">
+                <label class="task-label"
+                  >Agreement Created<input type="text" class="task-date" placeholder="Enter date"
+                /></label>
+                <label class="task-label"
+                  >PO & Signatures Received<input type="text" class="task-date" placeholder="Enter date"
+                /></label>
+                <label class="task-label"
+                  >Scheduled Delivery<input type="text" class="task-date" placeholder="Enter date"
+                /></label>
+                <label class="task-label"
+                  >Return Scheduled<input type="text" class="task-date" placeholder="Enter date"
+                /></label>
+                <label class="task-label"
+                  >Complete<input type="text" class="task-date" placeholder="Enter date"
+                /></label>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                Document <button class="note-button" onclick="showAddDocumentSection(this, 'demo')">+</button>
+              </th>
+              <td class="documents" data-section="demo"></td>
+            </tr>
+            <tr>
+              <th>Notes</th>
+              <td class="notes"></td>
+            </tr>
+          </table>
+          <textarea class="note-input"></textarea>
+          <button class="note-button" onclick="addNote(this)">Add Note</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Conferences</h2>
+        <form id="addConferenceForm">
+          <div class="wide-input">
+            <label for="conferenceName">Conference</label>
+            <input type="text" id="conferenceName" placeholder="Conference" required />
+          </div>
+          <div class="wide-input">
+            <label for="conferenceLocation">Location</label>
+            <input type="text" id="conferenceLocation" placeholder="Location" required />
+          </div>
+          <div class="date-container">
+            <label for="conferenceStartDate">Start Date</label>
+            <input
+              type="text"
+              id="conferenceStartDate"
+              class="small-input"
+              placeholder="Start Date"
+              required
+            />
+          </div>
+          <div class="date-container">
+            <label for="conferenceEndDate">End Date</label>
+            <input type="text" id="conferenceEndDate" class="small-input" placeholder="End Date" required />
+          </div>
+          <button type="submit">Add Conference</button>
+        </form>
+        <div id="conferenceList"></div>
+      </div>
+
+      <div id="conferenceTemplate" class="entry" style="display: none">
+        <div class="entry-header">
+          <span class="conference-details"></span>
+          <div class="actions">
+            <button class="edit" onclick="toggleEntry(this)">✏️</button>
+            <button class="delete" onclick="confirmDeleteEvent(event, this)">🗑️</button>
+          </div>
+        </div>
+        <div class="entry-content">
+          <table>
+            <tr>
+              <th>Conference</th>
+              <td class="conference-name"></td>
+            </tr>
+            <tr>
+              <th>Location</th>
+              <td class="conference-location"></td>
+            </tr>
+            <tr>
+              <th>Dates</th>
+              <td class="conference-dates"></td>
+            </tr>
+            <tr>
+              <th>
+                Equipment
+                <button class="note-button" onclick="showAddEquipmentSection(this, 'conference')">+</button>
+              </th>
+              <td class="equipment">
+                <button
+                  id="exportConferenceButton"
+                  style="display: none"
+                  onclick="exportConferenceEquipment()"
+                >
+                  Export
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <th>Tasks</th>
+              <td class="tasks">
+                <label class="task-label"
+                  >Agreement Created<input type="text" class="task-date" placeholder="Enter date"
+                /></label>
+                <label class="task-label"
+                  >PO & Signatures Received<input type="text" class="task-date" placeholder="Enter date"
+                /></label>
+                <label class="task-label"
+                  >Scheduled Delivery<input type="text" class="task-date" placeholder="Enter date"
+                /></label>
+                <label class="task-label"
+                  >Return Scheduled<input type="text" class="task-date" placeholder="Enter date"
+                /></label>
+                <label class="task-label"
+                  >Complete<input type="text" class="task-date" placeholder="Enter date"
+                /></label>
+              </td>
+            </tr>
+            <tr>
+              <th>
+                Document
+                <button class="note-button" onclick="showAddDocumentSection(this, 'conference')">+</button>
+              </th>
+              <td class="documents" data-section="conference"></td>
+            </tr>
+            <tr>
+              <th>Notes</th>
+              <td class="notes"></td>
+            </tr>
+          </table>
+          <textarea class="note-input"></textarea>
+          <button class="note-button" onclick="addNote(this)">Add Note</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Inventory</h2>
+        <div id="scrollableContainer">
+          <div id="inventoryContainer">
+            <div>
+              <label for="item1">DEMO-K3DEC00-2 Demo Transrectal Probe</label>
+              <input type="number" id="item1" name="item1" value="0" />
+            </div>
+            <div>
+              <label for="item2">DEMO-K3DEL00 Demo Transperineal Probe</label>
+              <input type="number" id="item2" name="item2" value="0" />
+            </div>
+            <div>
+              <label for="item3">DEMO-KURO-3000-3 Demo Trinity System</label>
+              <input type="number" id="item3" name="item3" value="0" />
+            </div>
+            <div>
+              <label for="item3">DEMO-KDNG00 Demo Single Use Transrectal Guide</label>
+              <input type="number" id="item3" name="item3" value="0" />
+            </div>
+            <div>
+              <label for="item3">DEMO-KMEC-5026 Demo End-Fire Steady Pro Support X1</label>
+              <input type="number" id="item3" name="item3" value="0" />
+            </div>
+            <div>
+              <label for="item3">DEMO-KMEC-5036 Demo Perine Steady Pro Support X1</label>
+              <input type="number" id="item3" name="item3" value="0" />
+            </div>
+            <div>
+              <label for="item3">DEMO-KPHAN-053-EF Demo TR Phantom</label>
+              <input type="number" id="item3" name="item3" value="0" />
+            </div>
+            <div>
+              <label for="item3">DEMO-KPHAN-S-1076 Demo SIMS Phantom</label>
+              <input type="number" id="item3" name="item3" value="0" />
+            </div>
+            <div>
+              <label for="item3">DEMO-KSP.ARM Demo Steady Pro V2 Arm</label>
+              <input type="number" id="item3" name="item3" value="0" />
+            </div>
+            <div>
+              <label for="item3">DEMO-KSU.EL1.18 Demo Single Use Mini Grid 18g X1</label>
+              <input type="number" id="item3" name="item3" value="0" />
+            </div>
+            <div>
+              <label for="item3">DEMO-KSU.EL4.18 Demo Single Use Perine Full Grid 18g X1</label>
+              <input type="number" id="item3" name="item3" value="0" />
+            </div>
+            <div>
+              <label for="item3">DEMO-PROMAP-LAPTOP Demo laptop for Promap Lite</label>
+              <input type="number" id="item3" name="item3" value="0" />
+            </div>
+            <div>
+              <label for="item3">DEMO ALCOHOL PAD Demo Alcohol Pad</label>
+              <input type="number" id="item3" name="item3" value="0" />
+            </div>
+            <div>
+              <label for="item3">DEMO-610-1038 Demo TR Probe Covers</label>
+              <input type="number" id="item3" name="item3" value="0" />
+            </div>
+            <div>
+              <label for="item3">DEMO-610-1127 Demo TP Probe Covers (CIVCO brands)</label>
+              <input type="number" id="item3" name="item3" value="0" />
+            </div>
+            <div>
+              <label for="item3">DEMO-MC1820 Demo Biopsy Needle (Bard Brand)</label>
+              <input type="number" id="item3" name="item3" value="0" />
+            </div>
+            <div>
+              <label for="item3">DEMO-K2DAB00 Demo Abdominal Probe</label>
+              <input type="number" id="item3" name="item3" value="0" />
+            </div>
+            <div>
+              <label for="item3">DEMO-K2DLN00 Demo linear Probe</label>
+              <input type="number" id="item3" name="item3" value="0" />
+            </div>
+            <div>
+              <label for="item3">DEMO-KRGA.EL5 Demo Perine Adapter</label>
+              <input type="number" id="item3" name="item3" value="0" />
+            </div>
+            <div>
+              <label for="item3">DEMO-CRYO-NEEDLE Demo Cryo Needle</label>
+              <input type="number" id="item3" name="item3" value="0" />
+            </div>
+            <div>
+              <label for="item3">DEMO-KPHA.00 Demo Steady Pro Arm</label>
+              <input type="number" id="item3" name="item3" value="0" />
+            </div>
+            <div>
+              <label for="item3">DEMO-KPHA.01.EL Demo Steady Pro Arm + Perine Support</label>
+              <input type="number" id="item3" name="item3" value="0" />
+            </div>
+            <div>
+              <label for="item3">DEMO-KPHA.EC.2 Demo Box Steady Pro Perine Support</label>
+              <input type="number" id="item3" name="item3" value="0" />
+            </div>
+            <div>
+              <label for="item3">DEMO-KSU.EL4.13 Demo Single Use Perine Full Grid 13G X1</label>
+              <input type="number" id="item3" name="item3" value="0" />
+            </div>
+            <div>
+              <label for="item3">DEMO-CONF.CLAMP Conference Table Clamp</label>
+              <input type="number" id="item3" name="item3" value="0" />
+            </div>
+          </div>
+        </div>
+        <div class="button-container">
+          <button id="updateInventoryButton">Update Inventory</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Calendar</h2>
+        <div id="calendar"></div>
+      </div>
+    </div>
+
+    <div id="addDemoEquipmentSection" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal('addDemoEquipmentSection')">x</span>
+        <select id="demoEquipmentSelect">
+          <option value="DEMO-K3DEC00-2">DEMO-K3DEC00-2 Demo Transrectal Probe</option>
+          <option value="DEMO-K3DEL00">DEMO-K3DEL00 Demo Transperineal Probe</option>
+          <option value="DEMO-KURO-3000-3">DEMO-KURO-3000-3 Demo Trinity System</option>
+          <option value="DEMO-KDNG00">DEMO-KDNG00 Demo Single Use Transrectal Guide</option>
+          <option value="DEMO-KMEC-5026">DEMO-KMEC-5026 Demo End-Fire Steady Pro Support X1</option>
+          <option value="DEMO-KMEC-5036">DEMO-KMEC-5036 Demo Perine Steady Pro Support X1</option>
+          <option value="DEMO-KPHAN-053-EF">DEMO-KPHAN-053-EF Demo TR Phantom</option>
+          <option value="DEMO-KPHAN-S-1076">DEMO-KPHAN-S-1076 Demo SIMS Phantom</option>
+          <option value="DEMO-KSP.ARM">DEMO-KSP.ARM Demo Steady Pro V2 Arm</option>
+          <option value="DEMO-KSU.EL1.18">DEMO-KSU.EL1.18 Demo Single Use Mini Grid 18g X1</option>
+          <option value="DEMO-KSU.EL4.18">DEMO-KSU.EL4.18 Demo Single Use Perine Full Grid 18g X1</option>
+          <option value="DEMO-PROMAP-LAPTOP">DEMO-PROMAP-LAPTOP Demo laptop for Promap Lite</option>
+          <option value="DEMO ALCOHOL PAD">DEMO ALCOHOL PAD Demo Alcohol Pad</option>
+          <option value="DEMO-610-1038">DEMO-610-1038 Demo TR Probe Covers</option>
+          <option value="DEMO-610-1127">DEMO-610-1127 Demo TP Probe Covers (CIVCO brands)</option>
+          <option value="DEMO-MC1820">DEMO-MC1820 Demo Biopsy Needle (Bard Brand)</option>
+          <option value="DEMO-K2DAB00">DEMO-K2DAB00 Demo Abdominal Probe</option>
+          <option value="DEMO-K2DLN00">DEMO-K2DLN00 Demo linear Probe</option>
+          <option value="DEMO-KRGA.EL5">DEMO-KRGA.EL5 Demo Perine Adapter</option>
+          <option value="DEMO-CRYO-NEEDLE">DEMO-CRYO-NEEDLE Demo Cryo Needle</option>
+          <option value="DEMO-KPHA.00">DEMO-KPHA.00 Demo Steady Pro Arm</option>
+          <option value="DEMO-KPHA.01.EL">DEMO-KPHA.01.EL Demo Steady Pro Arm + Perine Support</option>
+          <option value="DEMO-KPHA.EC.2">DEMO-KPHA.EC.2 Demo Box Steady Pro Perine Support</option>
+          <option value="DEMO-KSU.EL4.13">DEMO-KSU.EL4.13 Demo Single Use Perine Full Grid 13G X1</option>
+          <option value="DEMO-CONF.CLAMP">DEMO-CONF.CLAMP Conference Table Clamp</option>
+        </select>
+        <input type="number" id="demoEquipmentQuantity" min="1" value="1" />
+        <button onclick="addDemoEquipment()">Add Equipment</button>
+      </div>
+    </div>
+
+    <div id="addConferenceEquipmentSection" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal('addConferenceEquipmentSection')">x</span>
+        <select id="conferenceEquipmentSelect">
+          <option value="DEMO-K3DEC00-2">DEMO-K3DEC00-2 Demo Transrectal Probe</option>
+          <option value="DEMO-K3DEL00">DEMO-K3DEL00 Demo Transperineal Probe</option>
+          <option value="DEMO-KURO-3000-3">DEMO-KURO-3000-3 Demo Trinity System</option>
+          <option value="DEMO-KDNG00">DEMO-KDNG00 Demo Single Use Transrectal Guide</option>
+          <option value="DEMO-KMEC-5026">DEMO-KMEC-5026 Demo End-Fire Steady Pro Support X1</option>
+          <option value="DEMO-KMEC-5036">DEMO-KMEC-5036 Demo Perine Steady Pro Support X1</option>
+          <option value="DEMO-KPHAN-053-EF">DEMO-KPHAN-053-EF Demo TR Phantom</option>
+          <option value="DEMO-KPHAN-S-1076">DEMO-KPHAN-S-1076 Demo SIMS Phantom</option>
+          <option value="DEMO-KSP.ARM">DEMO-KSP.ARM Demo Steady Pro V2 Arm</option>
+          <option value="DEMO-KSU.EL1.18">DEMO-KSU.EL1.18 Demo Single Use Mini Grid 18g X1</option>
+          <option value="DEMO-KSU.EL4.18">DEMO-KSU.EL4.18 Demo Single Use Perine Full Grid 18g X1</option>
+          <option value="DEMO-PROMAP-LAPTOP">DEMO-PROMAP-LAPTOP Demo Laptop for Promap Lite</option>
+          <option value="DEMO ALCOHOL PAD">DEMO ALCOHOL PAD Demo Alcohol Pad</option>
+          <option value="DEMO-610-1038">DEMO-610-1038 Demo TR Probe Covers</option>
+          <option value="DEMO-610-1127">DEMO-610-1127 Demo TP Probe Covers (CIVCO Brands)</option>
+          <option value="DEMO-MC1820">DEMO-MC1820 Demo Biopsy Needle (Bard Brand)</option>
+          <option value="DEMO-K2DAB00">DEMO-K2DAB00 Demo Abdominal Probe</option>
+          <option value="DEMO-K2DLN00">DEMO-K2DLN00 Demo Linear Probe</option>
+          <option value="DEMO-KRGA.EL5">DEMO-KRGA.EL5 Demo Perine Adapter</option>
+          <option value="DEMO-CRYO-NEEDLE">DEMO-CRYO-NEEDLE Demo Cryo Needle</option>
+          <option value="DEMO-KPHA.00">DEMO-KPHA.00 Demo Steady Pro Arm</option>
+          <option value="DEMO-KPHA.01.EL">DEMO-KPHA.01.EL Demo Steady Pro Arm + Perine Support</option>
+          <option value="DEMO-KPHA.EC.2">DEMO-KPHA.EC.2 Demo Box Steady Pro Perine Support</option>
+          <option value="DEMO-KSU.EL4.13">DEMO-KSU.EL4.13 Demo Single Use Perine Full Grid 13G X1</option>
+          <option value="DEMO-CONF.CLAMP">DEMO-CONF.CLAMP Conference Table Clamp</option>
+        </select>
+        <input type="number" id="conferenceEquipmentQuantity" min="1" value="1" />
+        <button onclick="addConferenceEquipment()">Add Equipment</button>
+      </div>
+    </div>
+
+    <footer>
+      <img
+        class="footer-logo"
+        src="https://i.ibb.co/10RLjqy/Untitled-design-removebg-preview.png"
+        alt="Logo"
+      />
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.9/flatpickr.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
